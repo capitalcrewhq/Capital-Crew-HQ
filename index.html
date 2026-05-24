@@ -1,323 +1,878 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Capital Crew HQ</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background-color: #0d1117; color: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
-        .card { background-color: #161b22; border: 1px solid #30363d; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-        .input-field { background-color: #0d1117; border: 1px solid #30363d; color: white; padding: 10px; border-radius: 8px; transition: border-color 0.2s; }
-        .input-field:focus { border-color: #58a6ff; outline: none; }
-        .tab-btn { transition: all 0.2s; border-bottom: 2px solid transparent; }
-        .tab-btn.active { border-bottom: 2px solid #58a6ff; color: #58a6ff; background-color: rgba(88, 166, 255, 0.05); }
-        .status-badge { padding: 2px 8px; rounded-radius: 12px; font-size: 11px; font-weight: 600; border-radius: 20px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Capital Crew — HQ</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:#0b0b0b;color:#efefef;min-height:100vh;}
+/* Gate */
+#gate{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:#0b0b0b;}
+.gate-box{background:#121212;border:1px solid #222;padding:40px;border-radius:12px;text-align:center;max-width:400px;width:100%;}
+.gate-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:700;margin-bottom:8px;}
+.gate-sub{font-size:14px;color:#888;margin-bottom:24px;}
+.gate-input{width:100%;padding:12px;background:#1c1c1c;border:1px solid #333;border-radius:6px;color:#fff;font-size:14px;margin-bottom:16px;text-align:center;outline:none;}
+.gate-btn{background:#00e5a0;color:#000;border:none;padding:12px 24px;border-radius:6px;font-weight:600;cursor:pointer;width:100%;font-size:14px;}
+.gate-error{color:#ff5c5c;font-size:13px;margin-top:12px;display:none;}
+/* Layout */
+#app{display:none;}
+.layout{display:flex;min-height:100vh;}
+.sidebar{width:220px;background:#111;border-right:1px solid #222;padding:20px 14px;display:flex;flex-direction:column;gap:3px;position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0;}
+.logo{margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #222;}
+.logo-tag{font-size:10px;color:#00e5a0;font-weight:700;text-transform:uppercase;letter-spacing:.12em;}
+.logo-name{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;}
+.logo-sub{font-size:11px;color:#444;margin-top:2px;}
+.nav-item,.nav-sub{padding:8px 10px;border-radius:6px;cursor:pointer;font-size:13px;color:#888;display:flex;align-items:center;gap:8px;transition:all .15s;user-select:none;border:1px solid transparent;}
+.nav-item:hover,.nav-sub:hover{background:#1c1c1c;color:#fff;}
+.nav-item.active,.nav-sub.active{background:rgba(0,229,160,0.1);color:#00e5a0;border-color:rgba(0,229,160,0.2);font-weight:600;}
+.dd-btn{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:10px;font-weight:700;letter-spacing:.1em;color:#444;text-transform:uppercase;border:none;background:transparent;width:100%;margin-top:10px;}
+.dd-btn:hover{color:#666;}
+.dd-btn .arr{font-size:8px;transition:transform .2s;}
+.dd-btn.open .arr{transform:rotate(90deg);}
+.dd-items{overflow:hidden;max-height:0;transition:max-height .3s ease;display:flex;flex-direction:column;gap:2px;}
+.dd-items.open{max-height:400px;}
+.sidebar-foot{margin-top:auto;padding-top:12px;border-top:1px solid #1a1a1a;font-size:11px;color:#333;text-align:center;}
+/* Main */
+.main{flex:1;padding:36px 44px;background:#0b0b0b;overflow-y:auto;max-width:960px;}
+.phdr{margin-bottom:28px;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.phdr-left h1{font-family:'Syne',sans-serif;font-size:28px;font-weight:700;margin:0;}
+.phdr-left p{font-size:13px;color:#666;margin:4px 0 0;}
+.add-btn{background:#00e5a0;color:#000;border:none;padding:8px 16px;border-radius:6px;font-weight:600;cursor:pointer;font-size:13px;white-space:nowrap;flex-shrink:0;}
+/* Stats */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
+.stat-card{background:#121212;border:1px solid #222;padding:18px;border-radius:10px;}
+.stat-label{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+.stat-val{font-size:26px;font-weight:700;font-family:'Syne',sans-serif;}
+.stat-sub{font-size:11px;color:#444;margin-top:4px;}
+/* Sections */
+.sec{margin-bottom:28px;}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.sec-title{font-size:13px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.06em;}
+.card{background:#121212;border:1px solid #1e1e1e;border-radius:10px;overflow:hidden;}
+.hint{font-size:11px;color:#444;margin-bottom:10px;font-style:italic;}
+.empty{padding:24px;text-align:center;color:#444;font-size:13px;}
+/* Legend & dots */
+.legend{display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap;background:#161616;border:1px solid #1e1e1e;border-radius:8px;padding:10px 14px;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:#666;}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0;}
+.dot.red{background:#ff5c5c;}
+.dot.orange{background:#ff9632;}
+.dot.yellow{background:#f5c542;}
+/* Attention & nsteps */
+.attn-item{display:flex;align-items:center;gap:12px;padding:12px 14px;}
+.nstep-item{display:flex;align-items:center;gap:10px;padding:10px 14px;transition:opacity .2s;}
+.nstep-item.checked{opacity:.4;}
+.nstep-add-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#161616;border-top:1px solid #1e1e1e;}
+/* Tables */
+.tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.tbl th{padding:10px 12px;color:#555;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #1e1e1e;background:#161616;}
+.tbl td{padding:9px 12px;border-bottom:1px solid #181818;vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:#161616;}
+.cell-inp{background:transparent;border:none;outline:none;color:#efefef;width:100%;font-family:'DM Sans',sans-serif;font-size:13px;}
+.cell-inp:focus{background:#1a1a1a;border-radius:3px;padding:0 4px;}
+.tbl-sel{background:#1c1c1c;border:1px solid #2a2a2a;color:#efefef;border-radius:5px;padding:4px 8px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;outline:none;width:100%;}
+/* Buttons */
+.del-btn{background:none;border:none;color:#333;cursor:pointer;font-size:13px;padding:2px 5px;}
+.del-btn:hover{color:#ff5c5c;}
+.remove-btn{font-size:11px;font-weight:600;padding:2px 8px;border:1px solid rgba(255,92,92,0.3);border-radius:4px;background:transparent;color:#ff5c5c;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+.add-green-btn{background:#00e5a0;color:#000;border:none;padding:5px 12px;border-radius:5px;font-weight:600;cursor:pointer;font-size:12px;white-space:nowrap;}
+.run-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 22px;background:#00e5a0;color:#080808;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;border:none;border-radius:6px;cursor:pointer;}
+.run-btn:disabled{opacity:.4;cursor:not-allowed;}
+.copy-btn-sm{font-size:12px;padding:3px 10px;border:1px solid #2a2a2a;border-radius:5px;background:transparent;color:#888;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.copy-btn-sm:hover{color:#efefef;}
+/* AI output */
+.ai-out{margin-top:16px;background:#121212;border:1px solid #222;border-radius:10px;overflow:hidden;}
+.out-hdr{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:1px solid #1e1e1e;background:#161616;}
+.out-tag{font-size:10px;font-weight:700;letter-spacing:.08em;color:#444;text-transform:uppercase;}
+.out-body{padding:16px;font-size:13px;line-height:1.75;color:#efefef;white-space:pre-wrap;font-family:'DM Mono',monospace;margin:0;}
+/* Forms */
+.field{margin-bottom:16px;}
+.fl{display:block;font-size:11px;font-weight:600;letter-spacing:.07em;color:#666;text-transform:uppercase;margin-bottom:6px;}
+.inp-el{background:#1c1c1c;border:1px solid #2a2a2a;border-radius:6px;color:#efefef;font-family:'DM Sans',sans-serif;font-size:13px;padding:9px 11px;outline:none;transition:border-color .15s;}
+.inp-el:focus{border-color:#00e5a0;}
+.ta{width:100%;background:#1c1c1c;border:1px solid #2a2a2a;border-radius:6px;color:#efefef;font-family:'DM Sans',sans-serif;font-size:13px;padding:9px 11px;outline:none;resize:vertical;min-height:88px;transition:border-color .15s;}
+.ta:focus{border-color:#00e5a0;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.chips{display:flex;flex-wrap:wrap;gap:6px;}
+.chip{padding:5px 13px;border:1px solid #2a2a2a;border-radius:20px;font-size:12px;font-weight:500;color:#666;cursor:pointer;transition:all .15s;user-select:none;}
+.chip:hover{border-color:#444;color:#efefef;}
+.chip.sel{background:rgba(0,229,160,0.12);border-color:rgba(0,229,160,0.25);color:#00e5a0;}
+/* Tasks */
+.task-card{background:#121212;border:1px solid #1e1e1e;border-radius:10px;overflow:hidden;margin-bottom:12px;}
+.task-hdr{display:flex;align-items:center;gap:9px;padding:11px 14px;border-bottom:1px solid #1e1e1e;background:#161616;}
+.task-item{display:flex;align-items:center;gap:9px;padding:8px 14px;transition:opacity .2s;}
+.task-item.checked{opacity:.4;}
+/* Calendar */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:8px;}
+.cal-day{background:#121212;border:1px solid #1e1e1e;border-radius:10px;overflow:hidden;min-height:160px;}
+.cal-day-hdr{padding:8px 10px;background:#161616;border-bottom:1px solid #1e1e1e;display:flex;align-items:center;justify-content:space-between;}
+.cal-day-name{font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em;}
+.cal-day-date{font-size:10px;color:#444;}
+.cal-slots{padding:6px;display:flex;flex-direction:column;gap:5px;}
+.cal-slot{border-radius:6px;padding:6px 8px;font-size:11px;cursor:pointer;position:relative;border:1px solid transparent;}
+.cal-slot-type{font-weight:600;margin-bottom:2px;}
+.cal-slot-who{color:rgba(255,255,255,0.6);font-size:10px;}
+.cal-slot-note{color:rgba(255,255,255,0.5);font-size:10px;margin-top:2px;font-style:italic;}
+.cal-add-slot{width:100%;background:transparent;border:1px dashed #252525;border-radius:5px;color:#444;font-size:11px;padding:5px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:4px;}
+.cal-add-slot:hover{border-color:#444;color:#888;}
+/* Outreach */
+.stage-badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;}
+/* Modal */
+#modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:1000;}
+.modal-box{background:#121212;border:1px solid #2a2a2a;border-radius:12px;padding:24px;max-width:460px;width:100%;max-height:90vh;overflow-y:auto;}
+.modal-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:16px;}
+.mf{margin-bottom:13px;}
+.btn-cancel{background:transparent;border:none;color:#888;padding:8px 16px;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;}
+.btn-save{background:#00e5a0;color:#000;border:none;padding:8px 18px;border-radius:6px;font-weight:600;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;}
+</style>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA-fGZiojcmJ0X78U-wZUgwahTRvzTWkCO",
+  authDomain: "capital-crew-hq.firebaseapp.com",
+  projectId: "capital-crew-hq",
+  databaseURL: "https://capital-crew-hq-default-rtdb.firebaseio.com",
+  storageBucket: "capital-crew-hq.firebasestorage.app",
+  messagingSenderId: "746123278381",
+  appId: "1:746123278381:web:7676cfeba96c301a1b20a4"
+};
+
+const PASSWORD = "brodonutsarefire";
+
+// ── Color maps ──
+const CATS = ["Social","Education","Exposure","Compete","Important","Outreach","Other"];
+const CC = {Social:"#00e5a0",Education:"#f5c542",Exposure:"#5b9cf6",Compete:"#00e5a0",Important:"#ff9632",Outreach:"#b57bee",Other:"#555"};
+const CB = {Social:"rgba(0,229,160,0.12)",Education:"rgba(245,197,66,0.12)",Exposure:"rgba(91,156,246,0.12)",Compete:"rgba(0,229,160,0.12)",Important:"rgba(255,150,50,0.12)",Outreach:"rgba(181,123,238,0.12)",Other:"#1c1c1c"};
+const CBR = {Social:"rgba(0,229,160,0.22)",Education:"rgba(245,197,66,0.22)",Exposure:"rgba(91,156,246,0.22)",Compete:"rgba(0,229,160,0.22)",Important:"rgba(255,150,50,0.22)",Outreach:"rgba(181,123,238,0.22)",Other:"#2a2a2a"};
+
+const STAGES = ["Not contacted","Reached out","In progress","Meeting scheduled","Confirmed","Passed"];
+const STAGE_C = {"Not contacted":"#555","Reached out":"#5b9cf6","In progress":"#f5c542","Meeting scheduled":"#ff9632","Confirmed":"#00e5a0","Passed":"#444"};
+const STAGE_B = {"Not contacted":"#1c1c1c","Reached out":"rgba(91,156,246,0.12)","In progress":"rgba(245,197,66,0.12)","Meeting scheduled":"rgba(255,150,50,0.12)","Confirmed":"rgba(0,229,160,0.12)","Passed":"#1a1a1a"};
+const STAGE_BR = {"Not contacted":"#2a2a2a","Reached out":"rgba(91,156,246,0.25)","In progress":"rgba(245,197,66,0.25)","Meeting scheduled":"rgba(255,150,50,0.25)","Confirmed":"rgba(0,229,160,0.25)","Passed":"#222"};
+
+const CONTENT_TYPES = ["Market recap","Interview","Educational","Funny/reaction","AI finance","Other"];
+const CT_C = {"Market recap":"#00e5a0","Interview":"#5b9cf6","Educational":"#f5c542","Funny/reaction":"#ff9632","AI finance":"#b57bee","Other":"#888"};
+const CT_B = {"Market recap":"rgba(0,229,160,0.15)","Interview":"rgba(91,156,246,0.15)","Educational":"rgba(245,197,66,0.15)","Funny/reaction":"rgba(255,150,50,0.15)","AI finance":"rgba(181,123,238,0.15)","Other":"#1c1c1c"};
+const CT_BR = {"Market recap":"rgba(0,229,160,0.3)","Interview":"rgba(91,156,246,0.3)","Educational":"rgba(245,197,66,0.3)","Funny/reaction":"rgba(255,150,50,0.3)","AI finance":"rgba(181,123,238,0.3)","Other":"#2a2a2a"};
+
+const MEMBERS = ["Abdullah","Matt","Atrina","Adi","Other"];
+
+const DAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+
+function getWeekDates() {
+  const now = new Date();
+  const day = now.getDay();
+  const mon = new Date(now);
+  mon.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
+  return DAYS.map((d, i) => {
+    const dt = new Date(mon);
+    dt.setDate(mon.getDate() + i);
+    return { name: d, date: dt.getDate() + "/" + (dt.getMonth()+1), isoDate: dt.toISOString().slice(0,10) };
+  });
+}
+
+const DEFAULT = {
+  trips:[
+    {id:1,org:"Federal Reserve NYC",date:"Oct 2025",capacity:"15",contact:"TBD",status:"Planning",notes:"Beginning of year"},
+    {id:2,org:"WSJ Tour",date:"TBD",capacity:"—",contact:"WSJ contacts",status:"Planning",notes:"Abdullah reaching out"},
+    {id:3,org:"NYSE",date:"TBD",capacity:"—",contact:"—",status:"Idea",notes:"Abdullah on logistics"},
+    {id:4,org:"BlackRock",date:"TBD",capacity:"—",contact:"Coach Brian",status:"Planning",notes:"Reporting sector"},
+    {id:5,org:"JPM Trading Sector",date:"TBD",capacity:"—",contact:"Adi + Rishi",status:"Idea",notes:"Through Adi and Rishi"},
+    {id:6,org:"Bank of America",date:"TBD",capacity:"—",contact:"Yash",status:"Idea",notes:"Trading sector via Yash"},
+  ],
+  comps:[
+    {id:1,name:"Fed Challenge",signup:"TBD",date:"TBD",team:"8 members",status:"Need dates"},
+    {id:2,name:"National Economics Challenge",signup:"TBD",date:"TBD",team:"4 members",status:"Need dates"},
+    {id:3,name:"Stock Market Competition",signup:"TBD",date:"Jan 2026",team:"—",status:"Upcoming"},
+  ],
+  tasks:[
+    {id:1,member:"Abdullah",text:"Get mic and tripod",cat:"Important",done:false},
+    {id:2,member:"Abdullah",text:"Figure out NYSE logistics",cat:"Exposure",done:false},
+    {id:3,member:"Abdullah",text:"Make logistics doc for field trips",cat:"Exposure",done:false},
+    {id:4,member:"Matt",text:"Make slides for trading + find right videos",cat:"Education",done:false},
+    {id:5,member:"Atrina",text:"Plan for personal finance curriculum",cat:"Education",done:false},
+    {id:6,member:"Atrina",text:"Find personal finance competition",cat:"Compete",done:false},
+    {id:7,member:"Adi",text:"Help coordinate JPM visit through Rishi",cat:"Exposure",done:false},
+  ],
+  nsteps:[
+    {id:1,text:"Get mic and tripod (Abdullah)",cat:"Important",done:false},
+    {id:2,text:"Figure out NYSE logistics (Abdullah)",cat:"Exposure",done:false},
+    {id:3,text:"Make logistics doc for field trips (Abdullah)",cat:"Exposure",done:false},
+    {id:4,text:"Make slides for trading + find videos (Matt)",cat:"Education",done:false},
+    {id:5,text:"Plan personal finance curriculum (Atrina)",cat:"Education",done:false},
+    {id:6,text:"Find personal finance competition (Atrina)",cat:"Compete",done:false},
+    {id:7,text:"Coordinate JPM visit through Rishi (Adi)",cat:"Exposure",done:false},
+  ],
+  social:{vids:0,tiktok:0,insta:0},
+  outreach:[],
+  calendar:{},
+};
+
+// Firebase
+const fbApp = initializeApp(firebaseConfig);
+const db = getDatabase(fbApp);
+const stateRef = ref(db, "appState");
+
+let state = null;
+let saveTimer = null;
+
+onValue(stateRef, (snapshot) => {
+  const data = snapshot.val();
+  state = data ? data : JSON.parse(JSON.stringify(DEFAULT));
+  if (!data) set(stateRef, state);
+  render();
+});
+
+function persist(newState) {
+  state = newState;
+  render();
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => set(stateRef, state), 600);
+}
+
+// ── Date helpers ──
+function parseDate(str) {
+  if (!str || str.trim().toUpperCase() === "TBD" || !str.trim()) return null;
+  const d = new Date(str.trim());
+  if (!isNaN(d)) return d;
+  const m = str.trim().match(/^([A-Za-z]+)\s+(\d{4})$/);
+  if (m) { const d2 = new Date(m[1]+" 1, "+m[2]); if (!isNaN(d2)) return d2; }
+  return null;
+}
+function daysUntil(date) {
+  const now = new Date(); now.setHours(0,0,0,0);
+  const d = new Date(date); d.setHours(0,0,0,0);
+  return Math.round((d-now)/86400000);
+}
+function getAttnItems() {
+  if (!state) return [];
+  const items = [];
+  const now = new Date(); now.setHours(0,0,0,0);
+  const cutoff = new Date(now); cutoff.setDate(cutoff.getDate()+60);
+  (state.trips||[]).forEach(t => {
+    if (t.status==="Done") return;
+    const d = parseDate(t.date);
+    if (d && d>=now && d<=cutoff) { const days=daysUntil(d); items.push({dot:days<=14?"red":days<=30?"orange":"yellow",title:"Trip: "+t.org,sub:t.date+" · "+days+" days away · "+t.status}); }
+  });
+  (state.comps||[]).forEach(c => {
+    if (c.status==="Done") return;
+    [{k:"signup",l:"Sign-up deadline"},{k:"date",l:"Competition date"}].forEach(({k,l}) => {
+      const d = parseDate(c[k]);
+      if (d && d>=now && d<=cutoff) { const days=daysUntil(d); items.push({dot:days<=14?"red":days<=30?"orange":"yellow",title:c.name+" — "+l,sub:c[k]+" · "+days+" days away"}); }
+    });
+  });
+  (state.tasks||[]).filter(t=>t.cat==="Important"&&!t.done).forEach(t => {
+    items.push({dot:"red",title:t.text,sub:"Important task · "+t.member});
+  });
+  return items;
+}
+
+// ── AI ──
+async function callAI(prompt) {
+  const r = await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1500,messages:[{role:"user",content:prompt}]})});
+  const d = await r.json();
+  if (d.error) throw new Error(d.error.message);
+  return d.content.map(b=>b.text||"").join("");
+}
+
+// ── State ──
+let currentPage = "overview";
+let contentOpen = true;
+let logisticsOpen = true;
+let modalType = null;
+let modalExtra = {};
+
+// ── Render ──
+function render() {
+  if (!document.getElementById("app")) return;
+  document.getElementById("app").innerHTML = buildApp();
+  attachEvents();
+}
+
+// ── Helpers ──
+function esc(s) { return (s||"").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function catBadge(cat) {
+  const c=CC[cat]||"#555",bg=CB[cat]||"#1c1c1c",br=CBR[cat]||"#2a2a2a";
+  return `<span style="background:${bg};color:${c};border:1px solid ${br};border-radius:20px;font-size:11px;font-weight:600;padding:2px 9px;white-space:nowrap;">${cat}</span>`;
+}
+function catSel(val,name) {
+  const c=CC[val]||"#555",bg=CB[val]||"#1c1c1c",br=CBR[val]||"#2a2a2a";
+  return `<select class="cat-sel" name="${name}" style="background:${bg};color:${c};border:1px solid ${br};border-radius:5px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;padding:3px 8px;outline:none;cursor:pointer;">${CATS.map(o=>`<option value="${o}"${o===val?" selected":""} style="background:#1a1a1a;color:#efefef;">${o}</option>`).join("")}</select>`;
+}
+function stageBadge(s) {
+  const c=STAGE_C[s]||"#555",bg=STAGE_B[s]||"#1c1c1c",br=STAGE_BR[s]||"#2a2a2a";
+  return `<span class="stage-badge" style="background:${bg};color:${c};border:1px solid ${br};">${s}</span>`;
+}
+function stageSel(val,attr) {
+  return `<select class="tbl-sel" ${attr}>${STAGES.map(o=>`<option${o===val?" selected":""}>${o}</option>`).join("")}</select>`;
+}
+function ctBadge(type) {
+  const c=CT_C[type]||"#888",bg=CT_B[type]||"#1c1c1c",br=CT_BR[type]||"#2a2a2a";
+  return `<span style="background:${bg};color:${c};border:1px solid ${br};border-radius:4px;font-size:10px;font-weight:600;padding:2px 7px;">${type}</span>`;
+}
+function memberAvatar(m) {
+  const ac={Abdullah:"#00e5a0",Matt:"#5b9cf6",Atrina:"#f5c542",Adi:"#b57bee"};
+  const abg={Abdullah:"rgba(0,229,160,0.12)",Matt:"rgba(91,156,246,0.12)",Atrina:"rgba(245,197,66,0.12)",Adi:"rgba(181,123,238,0.12)"};
+  const col=ac[m]||"#888",bg=abg[m]||"#1c1c1c";
+  return `<div style="width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;background:${bg};color:${col};flex-shrink:0;">${m.slice(0,2).toUpperCase()}</div>`;
+}
+
+// ── Build app ──
+function buildApp() {
+  const attn = getAttnItems();
+  return `<div class="layout">
+    <aside class="sidebar">
+      <div class="logo">
+        <div class="logo-tag">Capital Crew</div>
+        <div class="logo-name">HQ</div>
+        <div class="logo-sub">Command center + logistics</div>
+      </div>
+      <div class="nav-item ${currentPage==="overview"?"active":""}" data-page="overview">📊 Overview</div>
+      <button class="dd-btn ${contentOpen?"open":""}" data-dd="content"><span>Content</span><span class="arr">▶</span></button>
+      <div class="dd-items ${contentOpen?"open":""}">
+        <div class="nav-sub ${currentPage==="scripts"?"active":""}" data-page="scripts">📹 Video scripts</div>
+        <div class="nav-sub ${currentPage==="captions"?"active":""}" data-page="captions"># Captions</div>
+        <div class="nav-sub ${currentPage==="clips"?"active":""}" data-page="clips">✂️ Clip finder</div>
+        <div class="nav-sub ${currentPage==="lessons"?"active":""}" data-page="lessons">📚 Lesson planner</div>
+        <div class="nav-sub ${currentPage==="calendar"?"active":""}" data-page="calendar">📅 Content calendar</div>
+      </div>
+      <button class="dd-btn ${logisticsOpen?"open":""}" data-dd="logistics"><span>Logistics</span><span class="arr">▶</span></button>
+      <div class="dd-items ${logisticsOpen?"open":""}">
+        <div class="nav-sub ${currentPage==="trips"?"active":""}" data-page="trips">✈️ Trips</div>
+        <div class="nav-sub ${currentPage==="comps"?"active":""}" data-page="comps">🏆 Competitions</div>
+        <div class="nav-sub ${currentPage==="tasks"?"active":""}" data-page="tasks">✅ Next steps</div>
+        <div class="nav-sub ${currentPage==="outreach"?"active":""}" data-page="outreach">📬 Outreach</div>
+        <div class="nav-sub ${currentPage==="social"?"active":""}" data-page="social">📈 Social media</div>
+      </div>
+      <div class="sidebar-foot">Realtime Sync Active 🟢</div>
+    </aside>
+    <main class="main">${buildPage(attn)}</main>
+  </div>`;
+}
+
+function buildPage(attn) {
+  switch(currentPage) {
+    case "overview": return buildOverview(attn);
+    case "scripts": return buildScripts();
+    case "captions": return buildCaptions();
+    case "clips": return buildClips();
+    case "lessons": return buildLessons();
+    case "calendar": return buildCalendar();
+    case "trips": return buildTrips();
+    case "comps": return buildComps();
+    case "tasks": return buildTasks();
+    case "outreach": return buildOutreach();
+    case "social": return buildSocial();
+    default: return buildOverview(attn);
+  }
+}
+
+// ── OVERVIEW ──
+function buildOverview(attn) {
+  const ns = state.nsteps||[];
+  return `
+  <div class="phdr"><div class="phdr-left"><h1>Overview</h1><p>Everything Capital Crew at a glance.</p></div></div>
+  <div class="stats-grid">
+    <div class="stat-card" style="border-color:rgba(0,229,160,0.2);background:rgba(0,229,160,0.08);">
+      <div class="stat-label">Trips planned</div><div class="stat-val" style="color:#00e5a0;">${(state.trips||[]).length}</div><div class="stat-sub">Fed, WSJ, NYSE +3</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Competitions</div><div class="stat-val">${(state.comps||[]).length}</div><div class="stat-sub">Fed, NEC, Stock Mkt</div>
+    </div>
+    <div class="stat-card" style="border-color:rgba(245,197,66,0.2);background:rgba(245,197,66,0.08);">
+      <div class="stat-label">Videos (30d)</div><div class="stat-val" style="color:#f5c542;">${(state.social||{}).vids||0}<span style="font-size:13px;color:#555;">/90</span></div><div class="stat-sub">Phase 1: quantity</div>
+    </div>
+    <div class="stat-card" style="border-color:rgba(255,92,92,0.2);background:rgba(255,92,92,0.08);">
+      <div class="stat-label">Needs attention</div><div class="stat-val" style="color:#ff5c5c;">${attn.length}</div><div class="stat-sub">Items flagged</div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sec-hdr"><span class="sec-title">🔴 Needs attention</span></div>
+    <div class="legend">
+      <span class="legend-item"><span class="dot red"></span>Critical — within 14 days or Important task</span>
+      <span class="legend-item"><span class="dot orange"></span>High — within 30 days</span>
+      <span class="legend-item"><span class="dot yellow"></span>Upcoming — within 60 days</span>
+    </div>
+    <div class="card">${attn.length===0?`<div class="empty">Nothing urgent right now — you're good.</div>`:attn.map((item,i)=>`
+      <div class="attn-item" style="${i<attn.length-1?"border-bottom:1px solid #1a1a1a":""}">
+        <div class="dot ${item.dot}"></div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:500;">${item.title}</div><div style="font-size:11px;color:#666;margin-top:2px;">${item.sub}</div></div>
+      </div>`).join("")}
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sec-hdr"><span class="sec-title">Team next steps</span></div>
+    <div class="card">
+      ${ns.map((n,i)=>`
+        <div class="nstep-item ${n.done?"checked":""}" style="${i<ns.length-1?"border-bottom:1px solid #181818":""}">
+          <input type="checkbox" class="nstep-cb" data-id="${n.id}" ${n.done?"checked":""} style="accent-color:#00e5a0;width:14px;height:14px;cursor:pointer;flex-shrink:0;">
+          <input type="text" class="nstep-text" data-id="${n.id}" value="${esc(n.text)}" style="flex:1;background:transparent;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:13px;color:#efefef;text-decoration:${n.done?"line-through":"none"};">
+          ${catSel(n.cat,"nstep-cat-"+n.id)}
+          ${n.done?`<button class="remove-btn" data-remove-nstep="${n.id}">Remove</button>`:`<button class="del-btn" data-del-nstep="${n.id}">✕</button>`}
+        </div>`).join("")}
+      <div class="nstep-add-row">
+        <input type="text" id="nstep-new" placeholder="Add a next step and press Enter..." style="flex:1;background:transparent;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:13px;color:#666;">
+        ${catSel("Social","nstep-new-cat")}
+        <button id="nstep-add-btn" class="add-green-btn">+ Add</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── CONTENT CALENDAR ──
+function buildCalendar() {
+  const weeks = getWeekDates();
+  const cal = state.calendar||{};
+  const now = new Date();
+  const todayIso = now.toISOString().slice(0,10);
+  return `
+  <div class="phdr"><div class="phdr-left"><h1>Content calendar</h1><p>This week's video schedule. Resets automatically every Monday.</p></div></div>
+  <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
+    ${CONTENT_TYPES.map(t=>`<span style="display:flex;align-items:center;gap:5px;font-size:11px;color:#666;"><span style="width:8px;height:8px;border-radius:2px;background:${CT_C[t]||'#888'};display:inline-block;"></span>${t}</span>`).join("")}
+  </div>
+  <div class="cal-grid">
+    ${weeks.map(day => {
+      const slots = (cal[day.isoDate]||[]);
+      const isToday = day.isoDate===todayIso;
+      return `<div class="cal-day" style="${isToday?"border-color:rgba(0,229,160,0.3);":""}">
+        <div class="cal-day-hdr" style="${isToday?"background:rgba(0,229,160,0.08);":""}">
+          <span class="cal-day-name" style="${isToday?"color:#00e5a0;":""}">${day.name}</span>
+          <span class="cal-day-date">${day.date}</span>
+        </div>
+        <div class="cal-slots">
+          ${slots.map((slot,si)=>`
+            <div class="cal-slot" style="background:${CT_B[slot.type]||'#1a1a1a'};border-color:${CT_BR[slot.type]||'#2a2a2a'};" data-edit-slot="${day.isoDate}" data-slot-idx="${si}">
+              <div class="cal-slot-type" style="color:${CT_C[slot.type]||'#888'};">${slot.type}</div>
+              <div class="cal-slot-who">${slot.who}</div>
+              ${slot.note?`<div class="cal-slot-note">${slot.note}</div>`:""}
+              <button class="del-btn" data-del-slot="${day.isoDate}" data-slot-idx="${si}" style="position:absolute;top:4px;right:4px;font-size:10px;padding:0 3px;">✕</button>
+            </div>`).join("")}
+          <button class="cal-add-slot" data-add-slot="${day.isoDate}">+ Add video</button>
+        </div>
+      </div>`;
+    }).join("")}
+  </div>`;
+}
+
+// ── OUTREACH ──
+function buildOutreach() {
+  const outreach = state.outreach||[];
+  const byStage = {};
+  STAGES.forEach(s=>byStage[s]=[]);
+  outreach.forEach(o=>{ if(byStage[o.stage]) byStage[o.stage].push(o); else byStage["Not contacted"].push(o); });
+  return `
+  <div class="phdr"><div class="phdr-left"><h1>Outreach</h1><p>Track every contact, connection, and follow-up.</p></div><button class="add-btn" id="outreach-add-btn">+ Add contact</button></div>
+  <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+    ${STAGES.map(s=>`<span style="display:flex;align-items:center;gap:6px;font-size:12px;color:#666;background:#161616;border:1px solid #1e1e1e;padding:4px 10px;border-radius:20px;">
+      <span style="width:7px;height:7px;border-radius:50%;background:${STAGE_C[s]};display:inline-block;"></span>${s} <span style="color:#444;">(${byStage[s].length})</span>
+    </span>`).join("")}
+  </div>
+  <div class="card">
+    <table class="tbl">
+      <thead><tr><th>Name / Org</th><th>Notes</th><th>Last contact</th><th>Stage</th><th>Follow-up</th><th></th></tr></thead>
+      <tbody>
+        ${outreach.length===0?`<tr><td colspan="6" style="text-align:center;color:#444;padding:24px;font-size:13px;">No contacts yet — add your first one.</td></tr>`:
+          outreach.map(o=>`<tr>
+            <td>
+              <div style="font-weight:600;font-size:13px;">${esc(o.name)}</div>
+              ${o.org?`<div style="font-size:11px;color:#555;margin-top:2px;">${esc(o.org)}</div>`:""}
+            </td>
+            <td><input class="cell-inp" data-or-field="notes" data-or-id="${o.id}" value="${esc(o.notes)}" placeholder="Notes..."></td>
+            <td><input class="cell-inp" data-or-field="lastContact" data-or-id="${o.id}" value="${esc(o.lastContact)}" placeholder="e.g. May 20" style="width:90px;"></td>
+            <td>${stageSel(o.stage,"data-or-status=\""+o.id+"\"")}</td>
+            <td><input class="cell-inp" data-or-field="followUp" data-or-id="${o.id}" value="${esc(o.followUp)}" placeholder="e.g. Jun 1" style="width:80px;"></td>
+            <td><button class="del-btn" data-del-or="${o.id}">✕</button></td>
+          </tr>`).join("")}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+// ── AI PAGES ──
+function buildScripts() {
+  return `
+  <div class="phdr"><div class="phdr-left"><h1>Video scripts</h1><p>Drop in your topic or notes — get a ready-to-film script.</p></div></div>
+  <div class="field"><label class="fl">Content type</label><div class="chips" id="chips-stype" data-val="Market recap">${["Market recap","Interview","Educational","Funny/reaction","AI finance"].map(o=>`<span class="chip${o==="Market recap"?" sel":""}" data-chip="${o}">${o}</span>`).join("")}</div></div>
+  <div class="field"><label class="fl">Topic or raw notes</label><textarea id="s-topic" class="ta" placeholder="e.g. NVDA earnings crushed it — stock up 8% after hours..."></textarea></div>
+  <div class="g2">
+    <div class="field"><label class="fl">Length</label><select id="s-len" class="inp-el" style="width:100%;"><option>25–30 seconds</option><option selected>30–40 seconds</option><option>45–60 seconds</option></select></div>
+    <div class="field"><label class="fl">Presenter (optional)</label><input id="s-presenter" class="inp-el" style="width:100%;" placeholder="e.g. Abdullah, Adi..."></div>
+  </div>
+  <button class="run-btn" id="s-run">✦ Generate script</button>
+  <div class="ai-out" id="s-out" style="display:none;"><div class="out-hdr"><span class="out-tag">Script</span><button class="copy-btn-sm" data-copy="s-result">Copy</button></div><pre class="out-body" id="s-result"></pre></div>`;
+}
+function buildCaptions() {
+  return `
+  <div class="phdr"><div class="phdr-left"><h1>Captions & hashtags</h1><p>Describe the video — get a caption and hashtag set ready to post.</p></div></div>
+  <div class="field"><label class="fl">What's the video about?</label><textarea id="c-topic" class="ta" placeholder="e.g. We broke down why gold pumped 7% this week..."></textarea></div>
+  <div class="field"><label class="fl">Vibe</label><div class="chips" id="chips-cvibe" data-val="Casual + punchy">${["Casual + punchy","Educational","Hype/motivational","Funny"].map(o=>`<span class="chip${o==="Casual + punchy"?" sel":""}" data-chip="${o}">${o}</span>`).join("")}</div></div>
+  <div class="field"><label class="fl">Platform</label><div class="chips" id="chips-cplat" data-val="TikTok">${["TikTok","Instagram","Both"].map(o=>`<span class="chip${o==="TikTok"?" sel":""}" data-chip="${o}">${o}</span>`).join("")}</div></div>
+  <button class="run-btn" id="c-run">✦ Generate captions</button>
+  <div class="ai-out" id="c-out" style="display:none;"><div class="out-hdr"><span class="out-tag">Caption + hashtags</span><button class="copy-btn-sm" data-copy="c-result">Copy</button></div><pre class="out-body" id="c-result"></pre></div>`;
+}
+function buildClips() {
+  return `
+  <div class="phdr"><div class="phdr-left"><h1>Clip finder</h1><p>Paste a transcript — AI finds the best 25–40 sec moments.</p></div></div>
+  <div class="field"><label class="fl">Transcript</label><textarea id="cl-t" class="ta" style="min-height:130px;" placeholder="Paste the full interview or video transcript here..."></textarea></div>
+  <div class="field"><label class="fl">How many clip ideas?</label><div class="chips" id="chips-clipn" data-val="5">${["3","5","8","10"].map(o=>`<span class="chip${o==="5"?" sel":""}" data-chip="${o}">${o}</span>`).join("")}</div></div>
+  <button class="run-btn" id="cl-run">✦ Find clip moments</button>
+  <div class="ai-out" id="cl-out" style="display:none;"><div class="out-hdr"><span class="out-tag">Clip breakdown</span><button class="copy-btn-sm" data-copy="cl-result">Copy</button></div><pre class="out-body" id="cl-result"></pre></div>`;
+}
+function buildLessons() {
+  return `
+  <div class="phdr"><div class="phdr-left"><h1>Lesson planner</h1><p>Generate a full lesson plan + slide outline for any finance topic.</p></div></div>
+  <div class="field"><label class="fl">Topic</label><input id="l-topic" class="inp-el" style="width:100%;" placeholder="e.g. How to read a stock chart, Options basics, What is inflation..."></div>
+  <div class="field"><label class="fl">Audience level</label><div class="chips" id="chips-llevel" data-val="Total beginner">${["Total beginner","Some knowledge","Intermediate"].map(o=>`<span class="chip${o==="Total beginner"?" sel":""}" data-chip="${o}">${o}</span>`).join("")}</div></div>
+  <div class="g2">
+    <div class="field"><label class="fl">Length</label><select id="l-len" class="inp-el" style="width:100%;"><option>20 minutes</option><option selected>30 minutes</option><option>45 minutes</option><option>60 minutes</option></select></div>
+    <div class="field"><label class="fl">Output</label><select id="l-type" class="inp-el" style="width:100%;"><option selected>Lesson plan + slide outline</option><option>Slide outline only</option><option>Lesson plan only</option></select></div>
+  </div>
+  <div class="field"><label class="fl">Specific things to cover (optional)</label><textarea id="l-notes" class="ta" style="min-height:65px;" placeholder="e.g. Include backtesting, cover candlestick patterns..."></textarea></div>
+  <button class="run-btn" id="l-run">✦ Generate lesson plan</button>
+  <div class="ai-out" id="l-out" style="display:none;"><div class="out-hdr"><span class="out-tag">Lesson plan</span><button class="copy-btn-sm" data-copy="l-result">Copy</button></div><pre class="out-body" id="l-result"></pre></div>`;
+}
+
+// ── TRIPS ──
+function buildTrips() {
+  const trips = state.trips||[];
+  return `
+  <div class="phdr"><div class="phdr-left"><h1>Trips</h1><p>Field trips, tours, and exposure experiences.</p></div><button class="add-btn" id="trip-add-btn">+ Add trip</button></div>
+  <p class="hint">Click any cell to edit. Dates within 60 days auto-show in Needs Attention.</p>
+  <div class="card"><table class="tbl">
+    <thead><tr><th>Organization</th><th>Date</th><th>Capacity</th><th>Contact</th><th>Status</th><th>Notes</th><th></th></tr></thead>
+    <tbody>${trips.map(t=>`<tr>
+      <td><input class="cell-inp" data-trip-field="org" data-trip-id="${t.id}" value="${esc(t.org)}"></td>
+      <td><input class="cell-inp" data-trip-field="date" data-trip-id="${t.id}" value="${esc(t.date)}"></td>
+      <td><input class="cell-inp" data-trip-field="capacity" data-trip-id="${t.id}" value="${esc(t.capacity)}" style="width:60px;"></td>
+      <td><input class="cell-inp" data-trip-field="contact" data-trip-id="${t.id}" value="${esc(t.contact)}"></td>
+      <td><select class="tbl-sel" data-trip-status="${t.id}">${["Idea","Planning","Confirming","Confirmed","Done"].map(o=>`<option${o===t.status?" selected":""}>${o}</option>`).join("")}</select></td>
+      <td><input class="cell-inp" data-trip-field="notes" data-trip-id="${t.id}" value="${esc(t.notes)}"></td>
+      <td><button class="del-btn" data-del-trip="${t.id}">✕</button></td>
+    </tr>`).join("")}</tbody>
+  </table></div>`;
+}
+
+// ── COMPS ──
+function buildComps() {
+  const comps = state.comps||[];
+  return `
+  <div class="phdr"><div class="phdr-left"><h1>Competitions</h1><p>Sign-up deadlines and logistics.</p></div><button class="add-btn" id="comp-add-btn">+ Add competition</button></div>
+  <p class="hint">Click any cell to edit. Dates within 60 days auto-show in Needs Attention.</p>
+  <div class="card"><table class="tbl">
+    <thead><tr><th>Competition</th><th>Sign-up deadline</th><th>Date</th><th>Team size</th><th>Status</th><th></th></tr></thead>
+    <tbody>${comps.map(c=>`<tr>
+      <td><input class="cell-inp" data-comp-field="name" data-comp-id="${c.id}" value="${esc(c.name)}"></td>
+      <td><input class="cell-inp" data-comp-field="signup" data-comp-id="${c.id}" value="${esc(c.signup)}"></td>
+      <td><input class="cell-inp" data-comp-field="date" data-comp-id="${c.id}" value="${esc(c.date)}"></td>
+      <td><input class="cell-inp" data-comp-field="team" data-comp-id="${c.id}" value="${esc(c.team)}" style="width:90px;"></td>
+      <td><select class="tbl-sel" data-comp-status="${c.id}">${["Need dates","Upcoming","Registered","In progress","Done"].map(o=>`<option${o===c.status?" selected":""}>${o}</option>`).join("")}</select></td>
+      <td><button class="del-btn" data-del-comp="${c.id}">✕</button></td>
+    </tr>`).join("")}</tbody>
+  </table></div>`;
+}
+
+// ── TASKS ──
+function buildTasks() {
+  const tasks = state.tasks||[];
+  const members = ["Abdullah","Matt","Atrina","Adi"];
+  return `
+  <div class="phdr"><div class="phdr-left"><h1>Next steps</h1><p>Who's doing what. "Important" tasks show in Needs Attention.</p></div><button class="add-btn" id="task-add-btn">+ Add task</button></div>
+  ${members.map(member=>{
+    const mt = tasks.filter(t=>t.member===member);
+    if (!mt.length) return "";
+    return `<div class="task-card">
+      <div class="task-hdr">${memberAvatar(member)}<span style="font-size:13px;font-weight:600;">${member}</span></div>
+      ${mt.map((t,ti)=>`
+        <div class="task-item ${t.done?"checked":""}" style="${ti<mt.length-1?"border-bottom:1px solid #181818":""}">
+          <input type="checkbox" class="task-cb" data-id="${t.id}" ${t.done?"checked":""} style="accent-color:#00e5a0;width:14px;height:14px;cursor:pointer;flex-shrink:0;">
+          <span style="flex:1;font-size:13px;text-decoration:${t.done?"line-through":"none"};">${esc(t.text)}</span>
+          ${catBadge(t.cat)}
+          ${t.done?`<button class="remove-btn" data-remove-task="${t.id}">Remove</button>`:""}
+        </div>`).join("")}
+    </div>`;
+  }).join("")}`;
+}
+
+// ── SOCIAL ──
+function buildSocial() {
+  const s = state.social||{vids:0,tiktok:0,insta:0};
+  const bar=(v,g,c)=>`<div style="background:#1c1c1c;border-radius:4px;height:5px;overflow:hidden;width:100%;margin-top:4px;"><div style="height:5px;border-radius:4px;background:${c};width:${Math.min(100,Math.round(v/g*100))}%;"></div></div>`;
+  return `
+  <div class="phdr"><div class="phdr-left"><h1>Social media</h1><p>Tracking growth toward 1,000 followers and 90 videos in 30 days.</p></div></div>
+  <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
+    <div class="stat-card" style="border-color:rgba(245,197,66,0.2);background:rgba(245,197,66,0.08);"><div class="stat-label">Videos posted</div><div class="stat-val" style="color:#f5c542;">${s.vids}<span style="font-size:13px;color:#555;">/90</span></div></div>
+    <div class="stat-card"><div class="stat-label">TikTok</div><div class="stat-val" style="color:#00e5a0;">${s.tiktok}</div><div class="stat-sub">Goal: 1,000</div></div>
+    <div class="stat-card"><div class="stat-label">Instagram</div><div class="stat-val" style="color:#00e5a0;">${s.insta}</div><div class="stat-sub">Goal: 1,000</div></div>
+  </div>
+  <div class="sec">
+    <div class="sec-hdr"><span class="sec-title">Update numbers</span></div>
+    <div class="card" style="padding:18px;display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
+      <div><label class="fl" style="display:block;margin-bottom:6px;">Videos posted</label><input id="soc-vids" class="inp-el" style="width:90px;" value="${s.vids}"></div>
+      <div><label class="fl" style="display:block;margin-bottom:6px;">TikTok followers</label><input id="soc-tiktok" class="inp-el" style="width:110px;" value="${s.tiktok}"></div>
+      <div><label class="fl" style="display:block;margin-bottom:6px;">Instagram followers</label><input id="soc-insta" class="inp-el" style="width:110px;" value="${s.insta}"></div>
+      <button class="run-btn" id="soc-update">Update</button>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sec-hdr"><span class="sec-title">Progress</span></div>
+    <div class="card" style="padding:20px;display:flex;flex-direction:column;gap:16px;">
+      <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:7px;"><span style="color:#666;">Videos toward 90</span><span style="color:#f5c542;font-weight:600;">${Math.min(100,Math.round(s.vids/90*100))}%</span></div>${bar(s.vids,90,"#f5c542")}</div>
+      <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:7px;"><span style="color:#666;">TikTok toward 1,000</span><span style="color:#00e5a0;font-weight:600;">${Math.min(100,Math.round(s.tiktok/1000*100))}%</span></div>${bar(s.tiktok,1000,"#00e5a0")}</div>
+      <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:7px;"><span style="color:#666;">Instagram toward 1,000</span><span style="color:#00e5a0;font-weight:600;">${Math.min(100,Math.round(s.insta/1000*100))}%</span></div>${bar(s.insta,1000,"#00e5a0")}</div>
+    </div>
+  </div>`;
+}
+
+// ── MODAL ──
+function openModal(type, extra={}) {
+  modalType = type; modalExtra = extra;
+  const titles = {trip:"Add trip",comp:"Add competition",task:"Add task",outreach:"Add contact",calSlot:"Add video to "+extra.dayName};
+  const memberOpts = MEMBERS.map(o=>`<option>${o}</option>`).join("");
+  const catOpts = CATS.map(o=>`<option>${o}</option>`).join("");
+  const bodies = {
+    trip:`
+      <div class="mf"><label class="fl">Organization</label><input class="inp-el" style="width:100%;" id="m-org" placeholder="e.g. Goldman Sachs"></div>
+      <div class="mf"><label class="fl">Date</label><input class="inp-el" style="width:100%;" id="m-date" placeholder="e.g. Mar 2026 or TBD"></div>
+      <div class="mf"><label class="fl">Capacity</label><input class="inp-el" style="width:100%;" id="m-cap" placeholder="e.g. 15"></div>
+      <div class="mf"><label class="fl">Contact</label><input class="inp-el" style="width:100%;" id="m-contact" placeholder="e.g. Coach Brian"></div>
+      <div class="mf"><label class="fl">Status</label><select class="inp-el" style="width:100%;" id="m-status">${["Idea","Planning","Confirming","Confirmed","Done"].map(o=>`<option>${o}</option>`).join("")}</select></div>
+      <div class="mf"><label class="fl">Notes</label><textarea class="ta" id="m-notes" style="min-height:60px;"></textarea></div>`,
+    comp:`
+      <div class="mf"><label class="fl">Competition name</label><input class="inp-el" style="width:100%;" id="m-name" placeholder="e.g. Wharton Investment Competition"></div>
+      <div class="mf"><label class="fl">Sign-up deadline</label><input class="inp-el" style="width:100%;" id="m-signup" placeholder="e.g. Dec 1 2025"></div>
+      <div class="mf"><label class="fl">Competition date</label><input class="inp-el" style="width:100%;" id="m-date" placeholder="e.g. Feb 2026"></div>
+      <div class="mf"><label class="fl">Team size</label><input class="inp-el" style="width:100%;" id="m-team" placeholder="e.g. 4 members"></div>
+      <div class="mf"><label class="fl">Status</label><select class="inp-el" style="width:100%;" id="m-cstatus">${["Need dates","Upcoming","Registered","In progress","Done"].map(o=>`<option>${o}</option>`).join("")}</select></div>`,
+    task:`
+      <div class="mf"><label class="fl">Member</label><select class="inp-el" style="width:100%;" id="m-member">${memberOpts}</select></div>
+      <div class="mf"><label class="fl">Task</label><input class="inp-el" style="width:100%;" id="m-task" placeholder="What needs to get done..."></div>
+      <div class="mf"><label class="fl">Category</label><select class="inp-el" style="width:100%;" id="m-cat">${catOpts}</select></div>`,
+    outreach:`
+      <div class="mf"><label class="fl">Name</label><input class="inp-el" style="width:100%;" id="m-or-name" placeholder="e.g. John Smith, Sarah from WSJ..."></div>
+      <div class="mf"><label class="fl">Organization (optional)</label><input class="inp-el" style="width:100%;" id="m-or-org" placeholder="e.g. Wall Street Journal, Federal Reserve..."></div>
+      <div class="mf"><label class="fl">Stage</label><select class="inp-el" style="width:100%;" id="m-or-stage">${STAGES.map(o=>`<option>${o}</option>`).join("")}</select></div>
+      <div class="mf"><label class="fl">Last contact date</label><input class="inp-el" style="width:100%;" id="m-or-last" placeholder="e.g. May 20, 2025"></div>
+      <div class="mf"><label class="fl">Follow-up date</label><input class="inp-el" style="width:100%;" id="m-or-followup" placeholder="e.g. Jun 1, 2025"></div>
+      <div class="mf"><label class="fl">Notes</label><textarea class="ta" id="m-or-notes" style="min-height:60px;" placeholder="What was discussed, what's next..."></textarea></div>`,
+    calSlot:`
+      <div class="mf"><label class="fl">Content type</label>
+        <select class="inp-el" style="width:100%;" id="m-cal-type">${CONTENT_TYPES.map(o=>`<option>${o}</option>`).join("")}</select>
+      </div>
+      <div class="mf"><label class="fl">Or type a custom type</label><input class="inp-el" style="width:100%;" id="m-cal-type-custom" placeholder="Leave blank to use selection above..."></div>
+      <div class="mf"><label class="fl">Who's responsible</label>
+        <select class="inp-el" style="width:100%;" id="m-cal-who">${MEMBERS.map(o=>`<option>${o}</option>`).join("")}</select>
+      </div>
+      <div class="mf"><label class="fl">Or type a name</label><input class="inp-el" style="width:100%;" id="m-cal-who-custom" placeholder="Leave blank to use selection above..."></div>
+      <div class="mf"><label class="fl">Note (optional)</label><input class="inp-el" style="width:100%;" id="m-cal-note" placeholder="e.g. Market recap for NVDA earnings..."></div>`,
+  };
+  document.getElementById("modal-bg").innerHTML = `
+    <div class="modal-box">
+      <div class="modal-title">${titles[type]||"Add"}</div>
+      ${bodies[type]||""}
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;">
+        <button class="btn-cancel" id="modal-cancel">Cancel</button>
+        <button class="btn-save" id="modal-save">Save</button>
+      </div>
+    </div>`;
+  document.getElementById("modal-bg").style.display = "flex";
+  document.getElementById("modal-cancel").onclick = closeModal;
+  document.getElementById("modal-save").onclick = saveModal;
+  document.getElementById("modal-bg").onclick = e => { if(e.target.id==="modal-bg") closeModal(); };
+}
+
+function closeModal() {
+  document.getElementById("modal-bg").style.display = "none";
+  document.getElementById("modal-bg").innerHTML = "";
+  modalType = null; modalExtra = {};
+}
+
+function saveModal() {
+  const g = id => (document.getElementById(id)||{}).value||"";
+  if (modalType==="trip") {
+    persist({...state,trips:[...(state.trips||[]),{id:Date.now(),org:g("m-org")||"New org",date:g("m-date")||"TBD",capacity:g("m-cap")||"—",contact:g("m-contact")||"—",status:g("m-status")||"Idea",notes:g("m-notes")||""}]});
+  } else if (modalType==="comp") {
+    persist({...state,comps:[...(state.comps||[]),{id:Date.now(),name:g("m-name")||"New competition",signup:g("m-signup")||"TBD",date:g("m-date")||"TBD",team:g("m-team")||"—",status:g("m-cstatus")||"Need dates"}]});
+  } else if (modalType==="task") {
+    const text=g("m-task"); if(!text.trim()){closeModal();return;}
+    persist({...state,tasks:[...(state.tasks||[]),{id:Date.now(),member:g("m-member")||"Abdullah",text,cat:g("m-cat")||"Other",done:false}]});
+  } else if (modalType==="outreach") {
+    const name=g("m-or-name"); if(!name.trim()){closeModal();return;}
+    const newContact={id:Date.now(),name,org:g("m-or-org"),stage:g("m-or-stage")||"Not contacted",lastContact:g("m-or-last"),followUp:g("m-or-followup"),notes:g("m-or-notes")};
+    persist({...state,outreach:[...(state.outreach||[]),newContact]});
+  } else if (modalType==="calSlot") {
+    const isoDate = modalExtra.isoDate;
+    const typeCustom = g("m-cal-type-custom").trim();
+    const whoCustom = g("m-cal-who-custom").trim();
+    const type = typeCustom || g("m-cal-type") || "Other";
+    const who = whoCustom || g("m-cal-who") || "TBD";
+    const note = g("m-cal-note");
+    const newSlot = {type,who,note};
+    const cal = JSON.parse(JSON.stringify(state.calendar||{}));
+    if (!cal[isoDate]) cal[isoDate]=[];
+    cal[isoDate].push(newSlot);
+    persist({...state,calendar:cal});
+  }
+  closeModal();
+}
+
+// ── EVENTS ──
+function attachEvents() {
+  const C = document.getElementById("app");
+
+  // Nav
+  C.querySelectorAll("[data-page]").forEach(el=>el.onclick=()=>{currentPage=el.dataset.page;render();});
+  C.querySelectorAll("[data-dd]").forEach(el=>el.onclick=()=>{if(el.dataset.dd==="content")contentOpen=!contentOpen;else logisticsOpen=!logisticsOpen;render();});
+
+  // Chips
+  C.querySelectorAll(".chips").forEach(g=>g.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{g.querySelectorAll(".chip").forEach(x=>x.classList.remove("sel"));c.classList.add("sel");g.dataset.val=c.dataset.chip;}));
+
+  // Copy
+  C.querySelectorAll(".copy-btn-sm").forEach(b=>b.onclick=()=>{const el=document.getElementById(b.dataset.copy);if(el)navigator.clipboard.writeText(el.textContent);b.textContent="Copied!";setTimeout(()=>b.textContent="Copy",1500);});
+
+  // AI runs
+  const aiSetup = (runId,outId,resId,getPrompt) => {
+    const btn=document.getElementById(runId);
+    if(btn) btn.onclick=async()=>{
+      const prompt=getPrompt();
+      if(!prompt)return;
+      btn.textContent="Generating...";btn.disabled=true;
+      try{const res=await callAI(prompt);document.getElementById(outId).style.display="block";document.getElementById(resId).textContent=res;}
+      catch(e){alert("Error: "+e.message);}
+      btn.textContent="✦ "+btn.textContent.replace("Generating...","").trim()||"Generate";btn.disabled=false;
+    };
+  };
+  const runBtnLabel=(id)=>{const el=document.getElementById(id);if(el){const orig=el.textContent;el.onclick=async()=>{};return orig;}return"Generate";};
+
+  const sBtn=document.getElementById("s-run");
+  if(sBtn)sBtn.onclick=async()=>{
+    const topic=(document.getElementById("s-topic")||{}).value?.trim();
+    if(!topic)return alert("Add a topic first.");
+    const type=document.querySelector("#chips-stype .sel")?.dataset.chip||"Market recap";
+    const len=(document.getElementById("s-len")||{}).value||"30–40 seconds";
+    const presenter=(document.getElementById("s-presenter")||{}).value?.trim()||"";
+    sBtn.textContent="Generating...";sBtn.disabled=true;
+    try{const res=await callAI(`Write a ${len} short-form video script for Capital Crew (high school finance club, WSJ-featured, top 0.7% NY state, casual-professional voice).\nContent type: ${type}${presenter?"\nPresenter: "+presenter:""}\nTopic: ${topic}\n\nFormat:\nHOOK: (first 2-3 seconds)\nBODY: (natural spoken lines)\nCTA: (punchy 1-liner)\nOutput ONLY the script.`);document.getElementById("s-out").style.display="block";document.getElementById("s-result").textContent=res;}
+    catch(e){alert("Error: "+e.message);}
+    sBtn.textContent="✦ Generate script";sBtn.disabled=false;
+  };
+
+  const cBtn=document.getElementById("c-run");
+  if(cBtn)cBtn.onclick=async()=>{
+    const topic=(document.getElementById("c-topic")||{}).value?.trim();
+    if(!topic)return alert("Describe the video first.");
+    const vibe=document.querySelector("#chips-cvibe .sel")?.dataset.chip||"Casual + punchy";
+    const plat=document.querySelector("#chips-cplat .sel")?.dataset.chip||"TikTok";
+    cBtn.textContent="Generating...";cBtn.disabled=true;
+    try{const res=await callAI(`Write a social media caption for Capital Crew (high school finance club, WSJ-featured, casual-professional).\nVideo: ${topic}\nVibe: ${vibe}\nPlatform: ${plat}\nOutput: 1. Caption (2-4 punchy lines) 2. 10-12 hashtags. Nothing else.`);document.getElementById("c-out").style.display="block";document.getElementById("c-result").textContent=res;}
+    catch(e){alert("Error: "+e.message);}
+    cBtn.textContent="✦ Generate captions";cBtn.disabled=false;
+  };
+
+  const clBtn=document.getElementById("cl-run");
+  if(clBtn)clBtn.onclick=async()=>{
+    const t=(document.getElementById("cl-t")||{}).value?.trim();
+    if(!t)return alert("Paste a transcript first.");
+    const count=document.querySelector("#chips-clipn .sel")?.dataset.chip||"5";
+    clBtn.textContent="Generating...";clBtn.disabled=true;
+    try{const res=await callAI(`Find the ${count} best short-form clip moments for Capital Crew (high school finance, TikTok/Instagram).\n\nTranscript:\n${t}\n\nFor each clip:\nCLIP #N\nStart: [quote]\nWhy it works: [1 line]\nHook line: [first words]\nSuggested length: [seconds]\n\nOutput only the clip breakdown.`);document.getElementById("cl-out").style.display="block";document.getElementById("cl-result").textContent=res;}
+    catch(e){alert("Error: "+e.message);}
+    clBtn.textContent="✦ Find clip moments";clBtn.disabled=false;
+  };
+
+  const lBtn=document.getElementById("l-run");
+  if(lBtn)lBtn.onclick=async()=>{
+    const topic=(document.getElementById("l-topic")||{}).value?.trim();
+    if(!topic)return alert("Enter a topic first.");
+    const level=document.querySelector("#chips-llevel .sel")?.dataset.chip||"Total beginner";
+    const len=(document.getElementById("l-len")||{}).value;
+    const type=(document.getElementById("l-type")||{}).value;
+    const notes=(document.getElementById("l-notes")||{}).value?.trim()||"";
+    lBtn.textContent="Generating...";lBtn.disabled=true;
+    try{const res=await callAI(`Create a finance lesson for Capital Crew (high school finance club, engaging and practical).\nTopic: ${topic}\nAudience: ${level}\nLength: ${len}\nOutput type: ${type}${notes?"\nCover: "+notes:""}\n\nFormat with LESSON PLAN and SLIDE DECK OUTLINE sections. No preamble.`);document.getElementById("l-out").style.display="block";document.getElementById("l-result").textContent=res;}
+    catch(e){alert("Error: "+e.message);}
+    lBtn.textContent="✦ Generate lesson plan";lBtn.disabled=false;
+  };
+
+  // Trips
+  C.querySelectorAll("[data-trip-field]").forEach(el=>el.onchange=()=>{const id=parseInt(el.dataset.tripId),field=el.dataset.tripField;persist({...state,trips:(state.trips||[]).map(t=>t.id===id?{...t,[field]:el.value}:t)});});
+  C.querySelectorAll("[data-trip-status]").forEach(el=>el.onchange=()=>{const id=parseInt(el.dataset.tripStatus);persist({...state,trips:(state.trips||[]).map(t=>t.id===id?{...t,status:el.value}:t)});});
+  C.querySelectorAll("[data-del-trip]").forEach(el=>el.onclick=()=>persist({...state,trips:(state.trips||[]).filter(t=>t.id!==parseInt(el.dataset.delTrip))}));
+  const tabBtn=document.getElementById("trip-add-btn");if(tabBtn)tabBtn.onclick=()=>openModal("trip");
+
+  // Comps
+  C.querySelectorAll("[data-comp-field]").forEach(el=>el.onchange=()=>{const id=parseInt(el.dataset.compId),field=el.dataset.compField;persist({...state,comps:(state.comps||[]).map(c=>c.id===id?{...c,[field]:el.value}:c)});});
+  C.querySelectorAll("[data-comp-status]").forEach(el=>el.onchange=()=>{const id=parseInt(el.dataset.compStatus);persist({...state,comps:(state.comps||[]).map(c=>c.id===id?{...c,status:el.value}:c)});});
+  C.querySelectorAll("[data-del-comp]").forEach(el=>el.onclick=()=>persist({...state,comps:(state.comps||[]).filter(c=>c.id!==parseInt(el.dataset.delComp))}));
+  const cabBtn=document.getElementById("comp-add-btn");if(cabBtn)cabBtn.onclick=()=>openModal("comp");
+
+  // Tasks
+  C.querySelectorAll(".task-cb").forEach(el=>el.onchange=()=>{const id=parseInt(el.dataset.id);persist({...state,tasks:(state.tasks||[]).map(t=>t.id===id?{...t,done:el.checked}:t)});});
+  C.querySelectorAll("[data-remove-task]").forEach(el=>el.onclick=()=>persist({...state,tasks:(state.tasks||[]).filter(t=>t.id!==parseInt(el.dataset.removeTask))}));
+  const taskBtn=document.getElementById("task-add-btn");if(taskBtn)taskBtn.onclick=()=>openModal("task");
+
+  // Nsteps
+  C.querySelectorAll(".nstep-cb").forEach(el=>el.onchange=()=>{const id=parseInt(el.dataset.id);persist({...state,nsteps:(state.nsteps||[]).map(n=>n.id===id?{...n,done:el.checked}:n)});});
+  C.querySelectorAll(".nstep-text").forEach(el=>el.onchange=()=>{const id=parseInt(el.dataset.id);persist({...state,nsteps:(state.nsteps||[]).map(n=>n.id===id?{...n,text:el.value}:n)});});
+  C.querySelectorAll(".cat-sel").forEach(el=>el.onchange=()=>{const name=el.name;if(name&&name.startsWith("nstep-cat-")){const id=parseInt(name.replace("nstep-cat-",""));persist({...state,nsteps:(state.nsteps||[]).map(n=>n.id===id?{...n,cat:el.value}:n)});}el.style.background=CB[el.value]||"#1c1c1c";el.style.color=CC[el.value]||"#555";el.style.borderColor=CBR[el.value]||"#2a2a2a";});
+  C.querySelectorAll("[data-del-nstep]").forEach(el=>el.onclick=()=>persist({...state,nsteps:(state.nsteps||[]).filter(n=>n.id!==parseInt(el.dataset.delNstep))}));
+  C.querySelectorAll("[data-remove-nstep]").forEach(el=>el.onclick=()=>persist({...state,nsteps:(state.nsteps||[]).filter(n=>n.id!==parseInt(el.dataset.removeNstep))}));
+  const nsAdd=document.getElementById("nstep-add-btn");
+  if(nsAdd)nsAdd.onclick=()=>{const inp=document.getElementById("nstep-new");const catEl=document.getElementsByName("nstep-new-cat")[0];if(inp&&inp.value.trim())persist({...state,nsteps:[...(state.nsteps||[]),{id:Date.now(),text:inp.value.trim(),cat:catEl?.value||"Social",done:false}]});};
+  const nsInp=document.getElementById("nstep-new");
+  if(nsInp)nsInp.onkeydown=e=>{if(e.key==="Enter"){const catEl=document.getElementsByName("nstep-new-cat")[0];if(nsInp.value.trim())persist({...state,nsteps:[...(state.nsteps||[]),{id:Date.now(),text:nsInp.value.trim(),cat:catEl?.value||"Social",done:false}]});}};
+
+  // Outreach
+  const orAddBtn=document.getElementById("outreach-add-btn");if(orAddBtn)orAddBtn.onclick=()=>openModal("outreach");
+  C.querySelectorAll("[data-or-field]").forEach(el=>el.onchange=()=>{const id=parseInt(el.dataset.orId),field=el.dataset.orField;persist({...state,outreach:(state.outreach||[]).map(o=>o.id===id?{...o,[field]:el.value}:o)});});
+  C.querySelectorAll("[data-or-status]").forEach(el=>el.onchange=()=>{const id=parseInt(el.dataset.orStatus);persist({...state,outreach:(state.outreach||[]).map(o=>o.id===id?{...o,stage:el.value}:o)});});
+  C.querySelectorAll("[data-del-or]").forEach(el=>el.onclick=()=>persist({...state,outreach:(state.outreach||[]).filter(o=>o.id!==parseInt(el.dataset.delOr))}));
+
+  // Calendar
+  C.querySelectorAll("[data-add-slot]").forEach(el=>el.onclick=()=>{
+    const isoDate=el.dataset.addSlot;
+    const dayInfo=getWeekDates().find(d=>d.isoDate===isoDate);
+    openModal("calSlot",{isoDate,dayName:dayInfo?dayInfo.name+" "+dayInfo.date:isoDate});
+  });
+  C.querySelectorAll("[data-del-slot]").forEach(el=>el.onclick=e=>{
+    e.stopPropagation();
+    const isoDate=el.dataset.delSlot,idx=parseInt(el.dataset.slotIdx);
+    const cal=JSON.parse(JSON.stringify(state.calendar||{}));
+    if(cal[isoDate]){cal[isoDate].splice(idx,1);if(!cal[isoDate].length)delete cal[isoDate];}
+    persist({...state,calendar:cal});
+  });
+
+  // Social
+  const socBtn=document.getElementById("soc-update");
+  if(socBtn)socBtn.onclick=()=>{const vids=parseInt(document.getElementById("soc-vids").value)||0,tiktok=parseInt(document.getElementById("soc-tiktok").value)||0,insta=parseInt(document.getElementById("soc-insta").value)||0;persist({...state,social:{vids,tiktok,insta}});};
+}
+
+// ── Password ──
+window.checkPassword = function() {
+  const input=document.getElementById("pw-input").value;
+  const err=document.getElementById("pw-error");
+  if(input===PASSWORD){document.getElementById("gate").style.display="none";document.getElementById("app").style.display="block";render();}
+  else{err.style.display="block";}
+};
+</script>
 </head>
-<body class="p-6 bg-[#0d1117]">
-
-    <div id="password-gate" class="fixed inset-0 bg-[#0d1117] flex flex-col justify-center items-center z-50">
-        <div class="card p-8 w-full max-w-md text-center border-t-4 border-t-blue-500">
-            <h1 class="text-3xl font-black mb-2 text-white tracking-wider">CAPITAL CREW HQ</h1>
-            <p class="text-gray-400 mb-6 text-sm">Operations & Automation Portal</p>
-            <input type="password" id="pass-input" class="w-full input-field text-center mb-4 text-lg tracking-widest" placeholder="••••••••">
-            <button onclick="checkPassword()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-lg shadow-lg transform active:scale-[0.98] transition">Unlock Dashboard</button>
-            <p id="pass-error" class="text-red-500 text-sm mt-3 hidden">⚠️ Incorrect password</p>
-        </div>
-    </div>
-
-    <div id="main-dashboard" class="hidden max-w-7xl mx-auto">
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 pb-5 border-b border-[#30363d]">
-            <div>
-                <h1 class="text-3xl font-extrabold text-white tracking-tight flex items-center gap-2">
-                    Capital Crew HQ <span class="text-xs font-normal text-gray-500 px-2 py-0.5 bg-gray-800 rounded border border-gray-700">v2.1</span>
-                </h1>
-                <p class="text-gray-400 text-sm mt-1">Central Logistics, Media Engines & Operations Hub</p>
-            </div>
-            <div class="mt-4 md:mt-0 flex items-center gap-2 text-xs bg-green-950/40 text-green-400 px-3 py-1.5 rounded-full border border-green-800/60 font-mono">
-                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Sync Active: Firebase Engine
-            </div>
-        </header>
-
-        <div class="flex space-x-1 mb-8 border-b border-[#30363d] bg-[#161b22] p-1 rounded-xl w-max max-w-full overflow-x-auto">
-            <button onclick="switchTab('logistics')" id="tab-logistics" class="tab-btn px-4 py-2 text-sm text-gray-400 font-medium rounded-lg active">✈️ Logistics & Team</button>
-            <button onclick="switchTab('outreach')" id="tab-outreach" class="tab-btn px-4 py-2 text-sm text-gray-400 font-medium rounded-lg">📊 Outreach Pipeline</button>
-            <button onclick="switchTab('calendar')" id="tab-calendar" class="tab-btn px-4 py-2 text-sm text-gray-400 font-medium rounded-lg">🗓️ Content Calendar</button>
-            <button onclick="switchTab('ai-content')" id="tab-ai-content" class="tab-btn px-4 py-2 text-sm text-gray-400 font-medium rounded-lg">🤖 AI Media Suite</button>
-        </div>
-
-        <div id="content-logistics" class="tab-content block space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="card p-5 border-l-4 border-l-blue-500">
-                    <h3 class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Global Content Speed</h3>
-                    <p class="text-3xl font-black text-white">90 Videos Goal</p>
-                    <div class="w-full bg-gray-800 h-2 rounded-full mt-3 overflow-hidden">
-                        <div class="bg-blue-500 h-full rounded-full" style="width: 68%"></div>
-                    </div>
-                    <p class="text-[11px] text-gray-400 mt-1.5 flex justify-between"><span>61 Completed</span> <span>68% achieved</span></p>
-                </div>
-                <div class="card p-5 border-l-4 border-l-yellow-500">
-                    <h3 class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Critical Deadlines</h3>
-                    <p class="text-3xl font-black text-white">2 Competitions</p>
-                    <p class="text-xs text-yellow-400 mt-2 flex items-center gap-1">⚠️ Actions required within the next 60 days.</p>
-                </div>
-                <div class="card p-5 border-l-4 border-l-purple-500">
-                    <h3 class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Social Growth Metric</h3>
-                    <p class="text-3xl font-black text-white">12.4K Base</p>
-                    <div class="w-full bg-gray-800 h-2 rounded-full mt-3 overflow-hidden">
-                        <div class="bg-purple-500 h-full rounded-full" style="width: 82%"></div>
-                    </div>
-                    <p class="text-[11px] text-gray-400 mt-1.5 flex justify-between"><span>Target: 15K</span> <span>82% of Goal</span></p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="card p-6">
-                    <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">✈️ Planned Trips & Competitions Matrix</h2>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs text-gray-300">
-                            <thead class="bg-[#1f242c] text-gray-400 font-mono">
-                                <tr>
-                                    <th class="p-2.5 rounded-l-md">Destination / Comp</th>
-                                    <th class="p-2.5">Date Window</th>
-                                    <th class="p-2.5">Team Size</th>
-                                    <th class="p-2.5 rounded-r-md">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-[#30363d]">
-                                <tr>
-                                    <td class="py-3 font-semibold text-white">NYC Finance Invitational</td>
-                                    <td class="py-3 text-gray-400">Oct 12 - Oct 15</td>
-                                    <td class="py-3">5 Active</td>
-                                    <td class="py-3"><span class="status-badge bg-green-900/40 text-green-400 border border-green-800">Confirmed</span></td>
-                                </tr>
-                                <tr>
-                                    <td class="py-3 font-semibold text-white">Chicago Trading Challenge</td>
-                                    <td class="py-3 text-gray-400">Nov 02 - Nov 06</td>
-                                    <td class="py-3">4 Active</td>
-                                    <td class="py-3"><span class="status-badge bg-yellow-900/40 text-yellow-400 border border-yellow-800">In Progress</span></td>
-                                </tr>
-                                <tr>
-                                    <td class="py-3 font-semibold text-white">Wharton Algorithmic</td>
-                                    <td class="py-3 text-gray-400">Jan 22 - Jan 25</td>
-                                    <td class="py-3">6 Active</td>
-                                    <td class="py-3"><span class="status-badge bg-gray-800 text-gray-400 border border-gray-700">Planned</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="card p-6">
-                    <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">👥 Team Next Steps & Operational Tasks</h2>
-                    <div class="space-y-3" id="task-list-container">
-                        <label class="flex items-start gap-3 bg-[#0d1117] p-3 rounded-lg border border-[#30363d] cursor-pointer hover:bg-gray-900 transition">
-                            <input type="checkbox" class="mt-1 rounded border-gray-700 bg-gray-800 text-blue-500 focus:ring-0" checked>
-                            <div>
-                                <p class="text-sm font-medium text-gray-400 line-through">Review weekly macro market recap scripts</p>
-                                <span class="text-[10px] font-mono bg-blue-950 text-blue-400 border border-blue-900 px-1.5 py-0.5 rounded">Media</span>
-                            </div>
-                        </label>
-                        <label class="flex items-start gap-3 bg-[#0d1117] p-3 rounded-lg border border-[#30363d] cursor-pointer hover:bg-gray-900 transition">
-                            <input type="checkbox" class="mt-1 rounded border-gray-700 bg-gray-800 text-blue-500 focus:ring-0">
-                            <div>
-                                <p class="text-sm font-medium text-white">Finalize registration slides for Chicago Trading Challenge</p>
-                                <span class="text-[10px] font-mono bg-yellow-950 text-yellow-400 border border-yellow-900 px-1.5 py-0.5 rounded">Logistics</span>
-                            </div>
-                        </label>
-                        <label class="flex items-start gap-3 bg-[#0d1117] p-3 rounded-lg border border-[#30363d] cursor-pointer hover:bg-gray-900 transition">
-                            <input type="checkbox" class="mt-1 rounded border-gray-700 bg-gray-800 text-blue-500 focus:ring-0">
-                            <div>
-                                <p class="text-sm font-medium text-white">Reach out to prospective guest speakers for December seminar</p>
-                                <span class="text-[10px] font-mono bg-purple-950 text-purple-400 border border-purple-900 px-1.5 py-0.5 rounded">Outreach</span>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="content-outreach" class="tab-content hidden space-y-4">
-            <div class="card p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <div>
-                        <h2 class="text-xl font-bold text-white">Outreach Pipeline Engine</h2>
-                        <p class="text-xs text-gray-400 mt-0.5">Track and manage institution communications, networks, and guest status.</p>
-                    </div>
-                    <button onclick="addOutreachRow()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-2 px-4 rounded-lg shadow transition transform active:scale-95">
-                        + Add Target Contact
-                    </button>
-                </div>
-                <div class="overflow-x-auto rounded-lg border border-[#30363d]">
-                    <table class="w-full text-left text-sm text-gray-300">
-                        <thead class="bg-[#1f242c] text-gray-400 font-mono text-xs uppercase tracking-wider">
-                            <tr>
-                                <th class="p-3.5">Target / Institution</th>
-                                <th class="p-3.5">Contact Agent</th>
-                                <th class="p-3.5">Pipeline Stage</th>
-                                <th class="p-3.5">Category Log / Notes</th>
-                                <th class="p-3.5">Follow-up</th>
-                            </tr>
-                        </thead>
-                        <tbody id="outreach-tbody" class="divide-y divide-[#30363d]"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div id="content-calendar" class="tab-content hidden space-y-4">
-            <div class="card p-6">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                    <div>
-                        <h2 class="text-xl font-bold text-white">Production Calendar Matrix</h2>
-                        <p class="text-xs text-gray-400 mt-0.5">Automated Monday cycle wipe • Multi-slot distribution arrays</p>
-                    </div>
-                    <button onclick="resetCalendarManual()" class="text-xs font-semibold bg-red-950/40 hover:bg-red-900/60 text-red-400 border border-red-900/60 py-2 px-4 rounded-lg transition">
-                        ⚠️ Force Clean Reset
-                    </button>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-7 gap-4" id="calendar-grid"></div>
-            </div>
-        </div>
-
-        <div id="content-ai-content" class="tab-content hidden grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="card p-6 border-t-4 border-t-purple-600">
-                <h2 class="text-xl font-bold text-white mb-1 flex items-center gap-2">🎬 Video Script & Hook Generator</h2>
-                <p class="text-xs text-gray-400 mb-4">Input raw concepts or source notes to isolate high-retention structural copy.</p>
-                <textarea class="w-full input-field h-36 mb-4 text-sm font-sans" placeholder="Paste structure themes or financial bullet points here..."></textarea>
-                <button class="bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm py-2.5 px-4 rounded-lg w-full shadow transition transform active:scale-95">Generate Structured Script Array</button>
-            </div>
-            <div class="card p-6 border-t-4 border-t-purple-600">
-                <h2 class="text-xl font-bold text-white mb-1 flex items-center gap-2">📝 Auto-Captions & Optimization Parser</h2>
-                <p class="text-xs text-gray-400 mb-4">Paste flat clip transcript formats to parse hook triggers, text highlights, and indexing tags.</p>
-                <textarea class="w-full input-field h-36 mb-4 text-sm font-mono" placeholder="Paste flat transcript layout text string data directly here..."></textarea>
-                <button class="bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm py-2.5 px-4 rounded-lg w-full shadow transition transform active:scale-95">Extract Dynamic Social Package</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        function checkPassword() {
-            const pass = document.getElementById('pass-input').value;
-            if (pass === 'brodonutsarefire') {
-                document.getElementById('password-gate').classList.add('hidden');
-                document.getElementById('main-dashboard').classList.remove('hidden');
-                initData();
-            } else {
-                document.getElementById('pass-error').classList.remove('hidden');
-            }
-        }
-
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.replace('block', 'hidden'));
-            document.getElementById(`tab-${tabId}`).classList.add('active');
-            document.getElementById(`content-${tabId}`).classList.replace('hidden', 'block');
-        }
-
-        const pipelineStages = ["Not Contacted", "Reached out", "Replied / In progress", "Meeting scheduled", "Confirmed", "Passed"];
-        let outreachData = JSON.parse(localStorage.getItem('outreachData')) || [
-            { target: "Wall Street Journal", name: "Media Desk Division", stage: "Reached out", notes: "Pitching macro club profile feature set", date: "2026-05-24" },
-            { target: "Federal Reserve System", name: "Speaker Coordinator Node", stage: "Replied / In progress", notes: "Awaiting final confirmation calendar validation", date: "2026-05-24" }
-        ];
-
-        function renderOutreach() {
-            const tbody = document.getElementById('outreach-tbody');
-            tbody.innerHTML = '';
-            outreachData.forEach((row, idx) => {
-                let stageOptions = pipelineStages.map(s => `<option value="${s}" ${row.stage === s ? 'selected' : ''}>${s}</option>`).join('');
-                tbody.innerHTML += `
-                    <tr class="hover:bg-[#1f242c]/50 transition">
-                        <td class="p-3"><input type="text" value="${row.target}" onchange="updateOutreach(${idx}, 'target', this.value)" class="bg-transparent border-b border-transparent focus:border-[#30363d] focus:bg-[#0d1117] rounded px-2 py-1 w-full text-white font-medium"></td>
-                        <td class="p-3"><input type="text" value="${row.name}" onchange="updateOutreach(${idx}, 'name', this.value)" class="bg-transparent border-b border-transparent focus:border-[#30363d] focus:bg-[#0d1117] rounded px-2 py-1 w-full text-gray-300"></td>
-                        <td class="p-3">
-                            <select onchange="updateOutreach(${idx}, 'stage', this.value)" class="bg-[#0d1117] text-sm text-blue-400 border border-[#30363d] rounded-lg px-2 py-1 w-full focus:ring-1 focus:ring-blue-500">
-                                ${stageOptions}
-                            </select>
-                        </td>
-                        <td class="p-3"><input type="text" value="${row.notes}" onchange="updateOutreach(${idx}, 'notes', this.value)" class="bg-transparent border-b border-transparent focus:border-[#30363d] focus:bg-[#0d1117] rounded px-2 py-1 w-full text-xs text-gray-400"></td>
-                        <td class="p-3 flex items-center justify-between gap-2 mt-1">
-                            <input type="date" value="${row.date}" onchange="updateOutreach(${idx}, 'date', this.value)" class="bg-transparent text-xs text-gray-400 font-mono focus:bg-[#0d1117] p-1 rounded">
-                            <button onclick="deleteOutreachRow(${idx})" class="text-gray-500 hover:text-red-400 text-sm px-2 transition">✕</button>
-                        </td>
-                    </tr>
-                `;
-            });
-            localStorage.setItem('outreachData', JSON.stringify(outreachData));
-        }
-
-        function addOutreachRow() {
-            outreachData.push({ target: "New Target Instance", name: "", stage: "Not Contacted", notes: "", date: new Date().toISOString().split('T')[0] });
-            renderOutreach();
-        }
-
-        function updateOutreach(idx, key, val) { outreachData[idx][key] = val; localStorage.setItem('outreachData', JSON.stringify(outreachData)); }
-        function deleteOutreachRow(idx) { outreachData.splice(idx, 1); renderOutreach(); }
-
-        const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-        let calendarData = JSON.parse(localStorage.getItem('calendarData')) || {};
-
-        function checkWeeklyReset() {
-            const lastReset = localStorage.getItem('lastCalendarResetWeek');
-            const currentWeek = getWeekNumber(new Date());
-            if (lastReset && lastReset != currentWeek) {
-                calendarData = {};
-                localStorage.setItem('calendarData', JSON.stringify(calendarData));
-            }
-            localStorage.setItem('lastCalendarResetWeek', currentWeek);
-        }
-
-        function getWeekNumber(d) {
-            d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
-            var startOfYear = new Date(Date.UTC(d.getUTCFullYear(),0,1));
-            return Math.ceil((((d - startOfYear) / 86400000) + 1)/7);
-        }
-
-        function renderCalendar() {
-            checkWeeklyReset();
-            const grid = document.getElementById('calendar-grid');
-            grid.innerHTML = '';
-            days.forEach(day => {
-                if (!calendarData[day]) calendarData[day] = [];
-                let slotsHtml = calendarData[day].map((slot, sIdx) => `
-                    <div class="bg-[#0d1117] p-2.5 rounded-lg border border-[#30363d] relative text-xs text-white mb-2 shadow-inner group">
-                        <input type="text" value="${slot.topic}" placeholder="Video Target Metric" onchange="updateCalendarSlot('${day}', ${sIdx}, 'topic', this.value)" class="w-full bg-transparent border-0 mb-1.5 font-bold text-white placeholder-gray-600 focus:ring-0 p-0 text-xs">
-                        <div class="flex flex-col gap-1 text-[10px]">
-                            <input type="text" value="${slot.owner}" placeholder="Assignee Initials" onchange="updateCalendarSlot('${day}', ${sIdx}, 'owner', this.value)" class="bg-[#161b22] px-1.5 py-0.5 rounded text-gray-300 border border-[#30363d] w-full">
-                            <select onchange="updateCalendarSlot('${day}', ${sIdx}, 'type', this.value)" class="bg-[#161b22] px-1 py-0.5 rounded text-blue-400 border border-[#30363d] w-full font-sans">
-                                <option value="Market recap" ${slot.type==='Market recap'?'selected':''}>Market Recap</option>
-                                <option value="Interview" ${slot.type==='Interview'?'selected':''}>Interview Array</option>
-                                <option value="Educational" ${slot.type==='Educational'?'selected':''}>Educational Block</option>
-                                <option value="Funny/Reaction" ${slot.type==='Funny/Reaction'?'selected':''}>Reaction Node</option>
-                                <option value="AI Finance" ${slot.type==='AI Finance'?'selected':''}>AI Finance Segment</option>
-                            </select>
-                        </div>
-                        <button onclick="deleteCalendarSlot('${day}', ${sIdx})" class="absolute top-1 right-1.5 text-gray-600 hover:text-red-400 transition text-[10px]">✕</button>
-                    </div>
-                `).join('');
-
-                grid.innerHTML += `
-                    <div class="card p-3 bg-[#161b22] border border-[#30363d] flex flex-col justify-between min-h-[260px]">
-                        <div>
-                            <h3 class="font-mono font-bold text-center border-b border-[#30363d] pb-2 mb-3 text-xs tracking-wider text-gray-300">${day.toUpperCase()}</h3>
-                            <div class="overflow-y-auto max-h-[220px]">${slotsHtml}</div>
-                        </div>
-                        <button onclick="addCalendarSlot('${day}')" class="w-full mt-2 text-center text-[11px] text-blue-400 hover:text-blue-300 border border-dashed border-blue-900/60 py-1.5 rounded-lg bg-blue-950/20 hover:bg-blue-950/40 transition">
-                            + Add Media Slot
-                        </button>
-                    </div>
-                `;
-            });
-        }
-
-        function addCalendarSlot(day) { calendarData[day].push({ topic: "", owner: "", type: "Market recap" }); localStorage.setItem('calendarData', JSON.stringify(calendarData)); renderCalendar(); }
-        function updateCalendarSlot(day, sIdx, key, val) { calendarData[day][sIdx][key] = val; localStorage.setItem('calendarData', JSON.stringify(calendarData)); }
-        function deleteCalendarSlot(day, sIdx) { calendarData[day].splice(sIdx, 1); localStorage.setItem('calendarData', JSON.stringify(calendarData)); renderCalendar(); }
-        function resetCalendarManual() { if(confirm("Clear this entire week's schedule array?")) { calendarData = {}; localStorage.setItem('calendarData', JSON.stringify(calendarData)); renderCalendar(); } }
-
-        function initData() { renderOutreach(); renderCalendar(); }
-    </script>
+<body>
+<div id="gate">
+  <div class="gate-box">
+    <div class="gate-title">Capital Crew HQ</div>
+    <div class="gate-sub">Enter passcode to access command center</div>
+    <input type="password" id="pw-input" class="gate-input" placeholder="••••••••••••" onkeydown="if(event.key==='Enter')checkPassword()">
+    <button class="gate-btn" onclick="checkPassword()">Unlock Dashboard</button>
+    <div id="pw-error" class="gate-error">Incorrect password. Try again.</div>
+  </div>
+</div>
+<div id="app"></div>
+<div id="modal-bg" style="position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:1000;"></div>
 </body>
 </html>
