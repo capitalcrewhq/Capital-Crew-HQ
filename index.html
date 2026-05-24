@@ -20,6 +20,30 @@ body{font-family:'DM Sans',sans-serif;background:#0b0b0b;color:#efefef;min-heigh
 #app{display:none;}
 .layout{display:flex;min-height:100vh;}
 .sidebar{width:220px;background:#111;border-right:1px solid #222;padding:20px 14px;display:flex;flex-direction:column;gap:3px;position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0;}
+/* Mobile hamburger */
+.mob-bar{display:none;align-items:center;justify-content:space-between;padding:14px 18px;background:#111;border-bottom:1px solid #222;position:sticky;top:0;z-index:50;}
+.mob-logo{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;}
+.mob-logo span{color:#00e5a0;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:1px;}
+.ham-btn{background:none;border:none;color:#efefef;cursor:pointer;font-size:22px;padding:4px 8px;line-height:1;}
+.mob-nav{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:100;flex-direction:column;padding:24px 20px;overflow-y:auto;}
+.mob-nav.open{display:flex;}
+.mob-nav-close{align-self:flex-end;background:none;border:none;color:#888;font-size:24px;cursor:pointer;margin-bottom:16px;}
+@media(max-width:700px){
+  .layout{flex-direction:column;}
+  .sidebar{display:none;}
+  .mob-bar{display:flex;}
+  .main{padding:20px 16px;max-width:100%;}
+  .stats-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
+  .g2{grid-template-columns:1fr;}
+  .cal-grid{grid-template-columns:1fr;gap:8px;}
+  .cal-day{min-height:auto;}
+  .tbl{font-size:12px;}
+  .tbl th,.tbl td{padding:7px 8px;}
+  .phdr{flex-direction:column;align-items:flex-start;gap:8px;}
+  .phdr .add-btn{width:100%;}
+  .nstep-add-row{flex-wrap:wrap;gap:8px;}
+  .legend{flex-direction:column;gap:8px;}
+}
 .logo{margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #222;}
 .logo-tag{font-size:10px;color:#00e5a0;font-weight:700;text-transform:uppercase;letter-spacing:.12em;}
 .logo-name{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;}
@@ -327,7 +351,33 @@ function memberAvatar(m) {
 // ── Build app ──
 function buildApp() {
   const attn = getAttnItems();
-  return `<div class="layout">
+  return `<div>
+  <div class="mob-bar">
+    <div class="mob-logo"><span>Capital Crew</span>HQ</div>
+    <button class="ham-btn" id="ham-open">☰</button>
+  </div>
+  <div class="mob-nav" id="mob-nav">
+    <button class="mob-nav-close" id="mob-nav-close">✕</button>
+    <div style="margin-bottom:8px;padding-bottom:12px;border-bottom:1px solid #222;">
+      <div style="font-size:10px;color:#00e5a0;font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px;">Capital Crew</div>
+      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;">HQ</div>
+    </div>
+    <div class="nav-item ${currentPage==="overview"?"active":""}" data-page="overview" data-mob>📊 Overview</div>
+    <div style="font-size:10px;font-weight:700;letter-spacing:.1em;color:#444;text-transform:uppercase;padding:12px 10px 4px;">Content</div>
+    <div class="nav-sub ${currentPage==="scripts"?"active":""}" data-page="scripts" data-mob>📹 Video scripts</div>
+    <div class="nav-sub ${currentPage==="captions"?"active":""}" data-page="captions" data-mob># Captions</div>
+    <div class="nav-sub ${currentPage==="clips"?"active":""}" data-page="clips" data-mob>✂️ Clip finder</div>
+    <div class="nav-sub ${currentPage==="lessons"?"active":""}" data-page="lessons" data-mob>📚 Lesson planner</div>
+    <div class="nav-sub ${currentPage==="calendar"?"active":""}" data-page="calendar" data-mob>📅 Content calendar</div>
+    <div style="font-size:10px;font-weight:700;letter-spacing:.1em;color:#444;text-transform:uppercase;padding:12px 10px 4px;">Logistics</div>
+    <div class="nav-sub ${currentPage==="trips"?"active":""}" data-page="trips" data-mob>✈️ Trips</div>
+    <div class="nav-sub ${currentPage==="comps"?"active":""}" data-page="comps" data-mob>🏆 Competitions</div>
+    <div class="nav-sub ${currentPage==="tasks"?"active":""}" data-page="tasks" data-mob>✅ Next steps</div>
+    <div class="nav-sub ${currentPage==="outreach"?"active":""}" data-page="outreach" data-mob>📬 Outreach</div>
+    <div class="nav-sub ${currentPage==="social"?"active":""}" data-page="social" data-mob>📈 Social media</div>
+    <div style="margin-top:auto;padding-top:16px;border-top:1px solid #1a1a1a;font-size:11px;color:#333;text-align:center;">Realtime Sync Active 🟢</div>
+  </div>
+  <div class="layout">
     <aside class="sidebar">
       <div class="logo">
         <div class="logo-tag">Capital Crew</div>
@@ -354,6 +404,7 @@ function buildApp() {
       <div class="sidebar-foot">Realtime Sync Active 🟢</div>
     </aside>
     <main class="main">${buildPage(attn)}</main>
+  </div>
   </div>`;
 }
 
@@ -847,6 +898,14 @@ function attachEvents() {
     if(cal[isoDate]){cal[isoDate].splice(idx,1);if(!cal[isoDate].length)delete cal[isoDate];}
     persist({...state,calendar:cal});
   });
+
+  // Mobile nav
+  const hamBtn=document.getElementById("ham-open");
+  const mobNav=document.getElementById("mob-nav");
+  const mobClose=document.getElementById("mob-nav-close");
+  if(hamBtn)hamBtn.onclick=()=>{mobNav.classList.add("open");};
+  if(mobClose)mobClose.onclick=()=>{mobNav.classList.remove("open");};
+  C.querySelectorAll("[data-mob]").forEach(el=>el.onclick=()=>{currentPage=el.dataset.page;mobNav.classList.remove("open");render();});
 
   // Social
   const socBtn=document.getElementById("soc-update");
