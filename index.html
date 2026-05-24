@@ -93,8 +93,7 @@
                                 <th class="p-3">Last Follow-up</th>
                             </tr>
                         </thead>
-                        <tbody id="outreach-tbody">
-                            </tbody>
+                        <tbody id="outreach-tbody"></tbody>
                     </table>
                 </div>
             </div>
@@ -111,22 +110,18 @@
                         Force Clean Reset
                     </button>
                 </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-7 gap-4" id="calendar-grid">
-                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-7 gap-4" id="calendar-grid"></div>
             </div>
         </div>
 
         <div id="content-ai-content" class="tab-content hidden grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="card p-6">
                 <h2 class="text-xl font-bold text-white mb-2">🎬 Video Script & Hook Generator</h2>
-                <p class="text-sm text-gray-400 mb-4">Pick content type, drop in notes, get hook/body/CTA breakdowns instantly.</p>
                 <textarea class="w-full input-field h-24 mb-3" placeholder="Paste structural concepts or background notes here..."></textarea>
                 <button class="bg-purple-600 hover:bg-purple-500 text-white text-sm py-2 px-4 rounded w-full">Generate AI Script</button>
             </div>
             <div class="card p-6">
                 <h2 class="text-xl font-bold text-white mb-2">📝 Auto-Captions & Clip Finder</h2>
-                <p class="text-sm text-gray-400 mb-4">Paste transcripts to extract short-form viral moments, timestamps, and hashtags.</p>
                 <textarea class="w-full input-field h-24 mb-3" placeholder="Paste full video transcript text here..."></textarea>
                 <button class="bg-purple-600 hover:bg-purple-500 text-white text-sm py-2 px-4 rounded w-full">Extract Clips & Tags</button>
             </div>
@@ -134,7 +129,6 @@
     </div>
 
     <script>
-        // Password Check
         function checkPassword() {
             const pass = document.getElementById('pass-input').value;
             if (pass === 'brodonutsarefire') {
@@ -142,26 +136,21 @@
                 document.getElementById('main-dashboard').classList.remove('hidden');
                 initData();
             } else {
-                const error = document.getElementById('pass-error');
-                error.classList.remove('hidden');
+                document.getElementById('pass-error').classList.remove('hidden');
             }
         }
 
-        // Navigation Tabs Engine
         function switchTab(tabId) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.replace('block', 'hidden'));
-            
             document.getElementById(`tab-${tabId}`).classList.add('active');
             document.getElementById(`content-${tabId}`).classList.replace('hidden', 'block');
         }
 
-        // --- OUTREACH PIPELINE ENGINE ---
         const pipelineStages = ["Not Contacted", "Reached out", "Replied / In progress", "Meeting scheduled", "Confirmed", "Passed"];
-        
         let outreachData = JSON.parse(localStorage.getItem('outreachData')) || [
-            { target: "Wall Street Journal", name: "Media Desk", stage: "Reached out", notes: "Pitching club profile features", date: "2026-05-20" },
-            { target: "Federal Reserve", name: "Speaker Coordinator", stage: "Replied / In progress", notes: "Awaiting confirmation on open seminar date", date: "2026-05-23" }
+            { target: "Wall Street Journal", name: "Media Desk", stage: "Reached out", notes: "Pitching profile features", date: "2026-05-24" },
+            { target: "Federal Reserve", name: "Speaker Coordinator", stage: "Replied / In progress", notes: "Awaiting confirm on seminar date", date: "2026-05-24" }
         ];
 
         function renderOutreach() {
@@ -169,7 +158,6 @@
             tbody.innerHTML = '';
             outreachData.forEach((row, idx) => {
                 let stageOptions = pipelineStages.map(s => `<option value="${s}" ${row.stage === s ? 'selected' : ''}>${s}</option>`).join('');
-                
                 tbody.innerHTML += `
                     <tr class="border-b border-[#30363d] hover:bg-[#161b22]">
                         <td class="p-3"><input type="text" value="${row.target}" onchange="updateOutreach(${idx}, 'target', this.value)" class="bg-transparent border-0 focus:ring-1 focus:ring-blue-500 rounded p-1 w-full text-white"></td>
@@ -195,17 +183,9 @@
             renderOutreach();
         }
 
-        function updateOutreach(idx, key, val) {
-            outreachData[idx][key] = val;
-            localStorage.setItem('outreachData', JSON.stringify(outreachData));
-        }
+        function updateOutreach(idx, key, val) { outreachData[idx][key] = val; localStorage.setItem('outreachData', JSON.stringify(outreachData)); }
+        function deleteOutreachRow(idx) { outreachData.splice(idx, 1); renderOutreach(); }
 
-        function deleteOutreachRow(idx) {
-            outreachData.splice(idx, 1);
-            renderOutreach();
-        }
-
-        // --- CONTENT CALENDAR ENGINE ---
         const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
         let calendarData = JSON.parse(localStorage.getItem('calendarData')) || {};
 
@@ -213,7 +193,7 @@
             const lastReset = localStorage.getItem('lastCalendarResetWeek');
             const currentWeek = getWeekNumber(new Date());
             if (lastReset && lastReset != currentWeek) {
-                calendarData = {}; // Clear entries for the fresh week
+                calendarData = {};
                 localStorage.setItem('calendarData', JSON.stringify(calendarData));
             }
             localStorage.setItem('lastCalendarResetWeek', currentWeek);
@@ -230,10 +210,8 @@
             checkWeeklyReset();
             const grid = document.getElementById('calendar-grid');
             grid.innerHTML = '';
-
             days.forEach(day => {
                 if (!calendarData[day]) calendarData[day] = [];
-                
                 let slotsHtml = calendarData[day].map((slot, sIdx) => `
                     <div class="bg-[#1f242c] p-2 rounded mb-2 border border-[#30363d] relative text-xs text-white">
                         <input type="text" value="${slot.topic}" placeholder="Topic/Idea" onchange="updateCalendarSlot('${day}', ${sIdx}, 'topic', this.value)" class="w-full bg-transparent border-0 mb-1 font-semibold text-white">
@@ -258,44 +236,19 @@
                             <div class="min-h-[120px]">${slotsHtml}</div>
                         </div>
                         <button onclick="addCalendarSlot('${day}')" class="w-full mt-2 text-center text-xs text-blue-400 hover:text-blue-300 border border-dashed border-[#30363d] py-1 rounded bg-transparent">
-                            + Add Video Slot
+                            + Add Slot
                         </button>
                     </div>
                 `;
             });
         }
 
-        function addCalendarSlot(day) {
-            calendarData[day].push({ topic: "", owner: "", type: "Market recap" });
-            localStorage.setItem('calendarData', JSON.stringify(calendarData));
-            renderCalendar();
-        }
+        function addCalendarSlot(day) { calendarData[day].push({ topic: "", owner: "", type: "Market recap" }); localStorage.setItem('calendarData', JSON.stringify(calendarData)); renderCalendar(); }
+        function updateCalendarSlot(day, sIdx, key, val) { calendarData[day][sIdx][key] = val; localStorage.setItem('calendarData', JSON.stringify(calendarData)); }
+        function deleteCalendarSlot(day, sIdx) { calendarData[day].splice(sIdx, 1); localStorage.setItem('calendarData', JSON.stringify(calendarData)); renderCalendar(); }
+        function resetCalendarManual() { if(confirm("Clear this week's schedule?")) { calendarData = {}; localStorage.setItem('calendarData', JSON.stringify(calendarData)); renderCalendar(); } }
 
-        function updateCalendarSlot(day, sIdx, key, val) {
-            calendarData[day][sIdx][key] = val;
-            localStorage.setItem('calendarData', JSON.stringify(calendarData));
-        }
-
-        function deleteCalendarSlot(day, sIdx) {
-            calendarData[day].splice(sIdx, 1);
-            localStorage.setItem('calendarData', JSON.stringify(calendarData));
-            renderCalendar();
-        }
-
-        function resetCalendarManual() {
-            if(confirm("Clear this entire week's schedule?")) {
-                calendarData = {};
-                localStorage.setItem('calendarData', JSON.stringify(calendarData));
-                renderCalendar();
-            }
-        }
-
-        // Master Initialization Call
-        function initData() {
-            renderOutreach();
-            renderCalendar();
-        }
+        function initData() { renderOutreach(); renderCalendar(); }
     </script>
-
-    </body>
+</body>
 </html>
